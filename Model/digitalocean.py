@@ -33,7 +33,7 @@ def upload_file_to_space(spaces_client, space_name, file_src, save_as, **kwargs)
     :return:
     """
 
-    is_public = kwargs.get("is_public", False)
+    is_public = True
     content_type = kwargs.get("content_type")
     meta = kwargs.get("meta")
 
@@ -46,7 +46,7 @@ def upload_file_to_space(spaces_client, space_name, file_src, save_as, **kwargs)
         content_type = file_type_guess[0]
 
     extra_args = {
-        'ACL': "public-read" if is_public else "private",
+        'ACL': "public-read",
         'ContentType': content_type
     }
 

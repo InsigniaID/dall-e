@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify, make_response, send_file,render_template, abort
 import datetime as dt
 from pathlib import Path
+import traceback
 
-from flask_sqlalchemy import SQLAlchemy
 from os import environ
 
 app = Flask(__name__)
@@ -60,14 +60,11 @@ def generate_image():
         result = combine.TheImages(file_name, background_image)
         result_path = result.create()
         print(f"RESULT PATH: {result_path}")
-        try:
-            result_upload = digitalocean.upload_file_to_space(client, os.getenv('AWS_BUCKET_NAME'), result_path, f"dalle/{result_path}")
-            print(f"RESULT UPLOAD: {result_upload}")
-        except :
-            return make_response(jsonify({'message': 'error uploading image'}), 500)
-
-        return make_response(jsonify({'message': 'image created'}), 201)
-    except:
+        result_upload = digitalocean.upload_file_to_space(client, os.getenv('AWS_BUCKET_NAME'), result_path, f"dalle/{result_path}")
+        print(f"RESULT UPLOAD: {result_upload}")
+        return make_response(jsonify({'message': 'image created', 'url': f"{os.getenv('AWS_ENDPOINT')}/dialox/dalle/{result_path}"}), 201)
+    except Exception:
+        traceback.print_exc()
         return make_response(jsonify({'message': 'error creating image'}), 500)
 
 def getReadableByteSize(num, suffix='B') -> str:
